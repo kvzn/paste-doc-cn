@@ -1,0 +1,260 @@
+Paste Script
+Paste脚本
+============
+
+:author: Ian Bicking <ianb@colorstudy.com>
+:revision: $Rev: 7360 $
+:date: $LastChangedDate: 2008-05-28 19:15:59 -0500 (Wed, 28 May 2008) $
+
+Contents:
+
+.. toctree::
+   :maxdepth: 1
+
+   news
+   developer
+   license
+
+Introduction
+------------
+
+If you are developer, see the `Developer Documentation
+<developer.html>`_; this will tell you how to add commands and
+templates to ``paster``.  For a list of updates see the `news file
+<news.html>`_.
+如果你是个开发者，查看`Developer Documentation <developer.html>`_;这将告诉你如何添加命令
+和模板到``paster``.更新列表请查看`news file <news.html>`_.
+
+Paste Script is released under the `MIT license
+<http://www.opensource.org/licenses/mit-license.php>`_.
+Paste脚本以`MIT license <http://www.opensource.org/licenses/mit-license.php>`_规则发布。
+
+Status
+现状
+------
+
+Paste Script has passed version 1.0.  Paste Script is an actively
+maintained project.  As of 1.0, we'll make a strong effort to maintain
+backward compatibility.  This will include deprecation warnings when
+necessary.  Major changes will take place under new functions or with
+new entry points.
+Paste脚本已经超过1.0版本了。Paste脚本是一个被活跃维护的项目。10版本我们会努力保持版本向后兼容。这将包括一些
+必要时候的反动警告。主要的改动将在新的函数或新的实体中实现。
+
+``paster serve``
+----------------
+
+The one useful command you may want to know about for ``paster`` is
+``paster serve``.  This serves an application described in a `Paste
+Deploy <http://pythonpaste.org/deploy>`_ configuration file.
+一个有用的命令是``paster server``.它服务于 `Paste Deploy <http://pythonpaste.org/deploy>`_配置文件
+中描述的程序。
+
+Configuration
+配置
+-------------
+
+A quickstart (and example), if not complete explanation::
+如果没有更细致的说明，一个快速开始的示例是：
+
+    [app:main]
+    use = egg:PasteEnabledPackage
+    option1 = foo
+    option2 = bar
+
+    [server:main]
+    use = egg:PasteScript#wsgiutils
+    host = 127.0.0.1
+    port = 80
+
+``egg:PasteEnabledPackage`` refers to some package that has been
+prepared for use with paste.deploy, and options given to that
+package.  If you are starting out with some framework, you'll have to
+reference some documentation for that framework to paste-deploy-ify
+your application (or read the paste.deploy documentation).
+``egg:PasteEnabledPackage``指向适用于paste.deploy的包，和一些提供给此包的配置项目。
+如果你已经开始使用一些框架，你需要参考此框架的相关文档中关于paste-deploy-ify的说明。(或
+者参阅paste.deploy文档)
+
+In the same file is a server description.
+``egg:PasteScript#wsgiutils`` is a server (named ``wsgiutils``)
+provided by this package, based on `WSGIUtils
+<http://www.owlfish.com/software/wsgiutils/>`_.  And we pass various
+options particular to that server.
+此文件中还有关于server的描述。``egg:PasteScript#wsgiutils``是此包提供的一个server
+(名叫``wsgiutils``),此server基于`WSGIUtils <http://www.owlfish.com/software/wsgiutils/>`_。
+在此我们忽略对此server其他配置项目的说明。
+
+Other packages can provide servers, but currently Paste Script
+includes glue for these:
+别的包也可以提供server,但是目前的Paste脚本包含一个可以将这些server粘合起来的服务：
+
+``wsgiutils``:
+
+    A `SimpleHTTPServer
+    <http://python.org/doc/current/lib/module-SimpleHTTPServer.html>`_
+    based threaded HTTP server, using `WSGIUtils
+    <http://www.owlfish.com/software/wsgiutils/>`_.
+
+    是一个`SimpleHTTPServer
+    <http://python.org/doc/current/lib/module-SimpleHTTPServer.html>`_
+    基于多线程的HTTP server, 使用`WSGIUtils
+    <http://www.owlfish.com/software/wsgiutils/>`_.
+
+``flup_(scgi|fcgi|ajp)_(thread|fork)``:
+
+    This set of servers supports `SCGI
+    <http://www.mems-exchange.org/software/scgi/>`_, `FastCGI
+    <http://www.fastcgi.com/>`_ and `AJP
+    <http://jakarta.apache.org/tomcat/connectors-doc/common/ajpv13a.html>`_
+    protocols, for connection an external web server (like Apache) to
+    your application.  Both threaded and forking versions are
+    available.  This is based on `flup
+    <http://www.saddi.com/software/flup/>`_.
+
+    这些服务支持`SCGI
+    <http://www.mems-exchange.org/software/scgi/>`_, `FastCGI
+    <http://www.fastcgi.com/>`_ 和`AJP
+    <http://jakarta.apache.org/tomcat/connectors-doc/common/ajpv13a.html>`_
+    协议,用来将你的程序与一个外部的web服务器(比如Apache)相连.所有的分支都是有效的。这基于`flup
+    <http://www.saddi.com/software/flup/>`_.
+
+There is the start of support for `twisted.web2
+<http://twistedmatrix.com/projects/web2/>`_ in
+``paste.script.twisted_web2_server``; patches welcome.
+
+也有对`twisted.web2
+<http://twistedmatrix.com/projects/web2/>`_ 的支持在
+``paste.script.twisted_web2_server``中; 欢迎打补丁.
+
+Running the Server
+运行server
+------------------
+
+``paster serve --help`` gives useful output::
+``paster serve --help`会给出有用的输出::
+
+  usage: /usr/local/bin/paster serve [options] CONFIG_FILE [start|stop|restart|status]
+  Serve the described application
+  用法:/usr/local/bin/paster serve [options] CONFIG_FILE [start|stop|restart|status]服务所述的程序
+
+  If start/stop/restart is given, then it will start (normal
+  operation), stop (--stop-daemon), or do both.  You probably want
+  ``--daemon`` as well for stopping.
+  如果包含start/stop/restart,他将start(一般选项),stop(--stop-daemon),或者两者都执行。
+  你很可能也需要使用``--daemon``来stop.
+
+  Options:
+    -h, --help            show this help message and exit
+    -v, --verbose         
+    -q, --quiet           
+    -nNAME, --app-name=NAME
+                          Load the named application (default main)
+						  加载指名的程序(默认是main)
+    -sSERVER_TYPE, --server=SERVER_TYPE
+                          Use the named server.
+						  使用指名的server.
+    --server-name=SECTION_NAME
+                          Use the named server as defined in the configuration
+                          file (default: main)
+						  使用指名的server作为配置文件中声明的server(默认是main)
+    --daemon              Run in daemon (background) mode
+						  以守护进程运行
+    --pid-file=FILENAME   Save PID to file (default to paster.pid if running in
+                          daemon mode)
+						  保存PID至文件(如果以守护进程运行则保存至paster.pid)
+    --log-file=LOG_FILE   Save output to the given log file (redirects stdout)
+						  保存输出到给定的log文件
+    --reload              Use auto-restart file monitor
+						  使用auto-restart文件监视
+    --reload-interval=RELOAD_INTERVAL
+                          Seconds between checking files (low number can cause
+                          significant CPU usage)
+						  检查文件的时间间隔(低值将导致CPU负载过高)
+    --status              Show the status of the (presumably daemonized) server
+						  显示server(假定以守护进程方式运行)的状态
+    --user=USERNAME       Set the user (usually only possible when run as root)
+						  设定使用者(通常只有以root账户运行时可用)
+    --group=GROUP         Set the group (usually only possible when run as root)
+						  设定租(通常只有以root账户运行时可用)
+    --stop-daemon         Stop a daemonized server (given a PID file, or default
+                          paster.pid file)
+						  停止一个守护进程方式运行的server(给定PID文件，或者默认paster.pid文件)
+
+Basically you give it a configuration file.  If you don't do anything
+else, it'll serve the ``[app:main]`` application with the
+``[server:main]`` server.  You can pass in ``--server-name=foo`` to
+serve the ``[server:foo]`` section (or even
+``--server-name=config:foo.ini`` to use a separate configuration
+file).
+最基本的你要提供一个配置文件。如果你不指定别的东西，它将使用``[server:main]``执行``[app:main]``程序。
+你可以通过``--server-name=foo``服务``[server:foo]``单元(或者``--server-name=config:foo.ini``
+使用一个独立的配置文件)
+
+Similarly you can use ``--app-name=foo`` to serve ``[app:foo]``.
+同样你可以使用``--app-name=foo``来服务``[app:foo]``.
+
+``--daemon`` will run the server in the backgroup, ``--user`` and
+``--group`` will set the user, as you might want to do from a start
+script (run as root).  If you don't give a ``--pid-file`` it will
+write the pid to ``paster.pid`` (in the current directory).
+``--daemon``会将server以后台进程运行，``--user``和``--group``可设置用户，你可在启动脚本中使用此配置
+(以root账户运行)。如果你没有给出``--pid-file``，它将pid写入``paster.pid``(在当前文件目录中)
+
+``--stop-daemon`` will stop the daemon in ``paster.pid`` or whatever
+``--pid-file`` you give.  ``--log-file`` will redirect stdout and
+stderr to that file.
+``--stop-daemon``可以将``paster.pid``或者你定义的任何``--pid-file``中的守护进程停止。``--log-file``
+将会记录输出和报错信息。
+
+``--reload`` will start the reload monitor, and restart the server
+whenever a file is edited.  This can be a little expensive, but is
+very useful during development.
+``--reload``可以开启重新载入监视，并且在一个配置文件被编辑后重启服务。这样代价会有点高，但是在开发中确实非常有用的。
+
+#! Scripts
+----------
+
+On Posix (Linux, Unix, etc) systems you can turn your configuration
+files into executable scripts.
+在Posix(Linux, Unix,等)系统中，你可以将你的配置文件写入可执行脚本中。
+
+First make the file executable (``chmod +x config_file.ini``).  The
+you should add a line like this to the top of the file::
+首先将文件设置为可执行(``chmod +x config_file.ini``). 然后你需要在文件中添加如下一行：
+
+    #!/usr/bin/env paster
+
+You can include a command and command-line options in an ``[exe]``
+section, like::
+你可以包含一个命令行的配置选项``[exe]``单元，如：
+
+    [exe]
+    command = serve
+    daemon = true
+    user = nobody
+    group = nobody
+
+(use ``true`` and ``false`` for options that don't take an argument).
+(为选项使用``true``和``false``不需参数)
+
+If you use ``daemon = true`` then you'll be able to use the script as
+an rc script, so you can do::
+如果你使用``daemon = true``，然后你将可以像rc脚本一样运行你的脚本，因此你可以：
+
+    $ sudo ./config_file.ini start
+    $ sudo ./config_file.ini restart
+
+and so forth.
+等等
+
+Note that this is a little wonky still on some platforms and shells
+(notably it doesn't work under `csh
+<http://www.faqs.org/faqs/unix-faq/shell/csh-whynot/>`_).  If you get
+an error about "Command config_file.ini not known" then this probably
+won't work for you.  In the future an additional script to ``paster``
+will be added just for this purpose.
+需要注意的是在一些平台或者shell上有些许不确定性(特别是没有在`csh
+<http://www.faqs.org/faqs/unix-faq/shell/csh-whynot/>`_下运行)。如果你得到一个关于
+"Command config_file.ini not known"的报错，然后这很可能不会正常工作。在未来``paster``的
+一个附加的脚本将为此目的而添加。
