@@ -582,6 +582,10 @@ be used, as a dictionary.  Both global and local configuration is
 combined into a single dictionary, but you can look at just one or the
 other with the attributes ``.local_conf`` and ``.global_conf``.
 
+如果你不想创建程序而得到配置，你可以使用``appconfig(uri)``函数，它与``loadapp()``类似，
+只是它返回的是字典类型的配置。全局和本地配置都会被合并进一个单独的字典，但是你可以通过
+``.local_conf``或``.global_conf``只得到你想要的。
+
 ``egg:`` URIs
 -------------
 
@@ -590,10 +594,18 @@ are a distribution and installation format produced by `setuptools
 <http://peak.telecommunity.com/DevCenter/setuptools>`_ that adds
 metadata to a normal Python package (among other things).
 
+`Python Eggs <http://peak.telecommunity.com/DevCenter/PythonEggs>`_
+是`setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_ 
+系统的分发和安装格式，它将一些元数据连同其它的东西添加到普通的Python包中。
+
 You don't need to understand a whole lot about Eggs to use them.  If
 you have a `distutils
 <http://python.org/doc/current/lib/module-distutils.html>`_
 ``setup.py`` script, just change::
+
+要使用Eggs你并不去要全面透彻地了解它。如果你有`distutils
+<http://python.org/doc/current/lib/module-distutils.html>`_
+``setup.py``脚本，那么将它改为::
 
     from distutils.core import setup
 
@@ -603,11 +615,17 @@ to::
 
 Now when you install the package it will be installed as an egg.
 
+现在当你安装包的时候，它会被以Egg的方式安装.
+
 The first important part about an Egg is that it has a
 *specification*.  This is formed from the name of your distribution
 (the ``name`` keyword argument to ``setup()``), and you can specify a
 specific version.  So you can have an egg named ``MyApp``, or
 ``MyApp==0.1`` to specify a specific version.
+
+Egg首要的部分是*specification*。这是从你的分发程序中定义的名字合成的(``name``来自
+``setup()``)，你也可以指名版本。隐私你可以有一个egg名叫``MyApp``,或``MyApp==0.1``
+来指名一个版本号。
 
 The second is *entry points*.  These are references to Python objects
 in your packages that are named and have a specific protocol.
@@ -615,10 +633,16 @@ in your packages that are named and have a specific protocol.
 certain arguments, and expect a specific return value.  We'll talk
 more about the protocols later_.
 
+其次重要的是*entry points*。其中有关联到对应位置的Python对象的名和指定的协议。
+这里的"Protocol"只是我们在调用对象的时候需要附随的一些参数，以及期待特定的返回值。
+稍候我们将详细讨论protocols_。
+
 .. _later: `Defining Factories`_
 
 The important part here is how we define entry points.  You'll add an
 argument to ``setup()`` like::
+
+此处最重要的是我们如何声明entry points。你需要添加一个变量给``setup()``，如::
 
     setup(
         name='MyApp',
@@ -634,11 +658,19 @@ This defines two applications named ``main`` and ``ob2``.  You can
 then refer to these by ``egg:MyApp#main`` (or just ``egg:MyApp``,
 since ``main`` is the default) and ``egg:MyApp#ob2``.
 
+这里声明了两个程序:``main``和``ob2``。你可以通过``egg:MyApp#main``(或仅仅``egg:MyApp``,
+因为``main``是默认的)和``egg:MyApp#ob2``来关联它们。
+
 The values are instructions for importing the objects.  ``main`` is
 located in the ``myapp.mymodule`` module, in an object named
 ``app_factory``.
 
+其中的value是为导入对象的指引。``main``是在``myapp.mymodule``模块的
+``app_actory``定位的。
+
 There's no way to add configuration to objects imported as Eggs.
+
+没有别的类似Egg的方法可以将配置文件导入。
 
 Defining Factories
 ------------------
